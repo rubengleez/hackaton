@@ -19,12 +19,14 @@ interface ProfileProps {
   onOpenOutfit: (outfitId: string) => void
   onEditProfile: () => void
   onOpenFollowers: (kind: 'followers' | 'following') => void
+  onLogout: () => void
 }
 
 export function Profile({
   onOpenOutfit,
   onEditProfile,
   onOpenFollowers,
+  onLogout,
 }: ProfileProps) {
   const {
     state,
@@ -109,15 +111,20 @@ export function Profile({
             <RotateCcw size={14} />
             Demo con datos guardados en este navegador
           </span>
-          <button
-            type="button"
-            onClick={() => {
-              resetDemo()
-              notify('Demo reiniciada')
-            }}
-          >
-            Reiniciar
-          </button>
+          <div className="profile-demo-actions">
+            <button
+              type="button"
+              onClick={() => {
+                resetDemo()
+                notify('Demo reiniciada')
+              }}
+            >
+              Reiniciar
+            </button>
+            <button type="button" onClick={onLogout}>
+              Salir
+            </button>
+          </div>
         </div>
 
         <div className="profile-tabs" role="tablist" aria-label="Contenido del perfil">

@@ -42,7 +42,7 @@ const demoPhotos = [
   { src: '/images/outfits/look-seated.jpg', label: 'sombra' },
 ]
 
-const styles: Style[] = ['Minimalista', 'Streetwear', 'Vintage', 'Boho', 'Clásico']
+const styles: Style[] = ['Minimalista', 'Casual', 'Streetwear', 'Vintage', 'Boho', 'Clásico']
 const occasions: Occasion[] = ['Universidad', 'Oficina', 'Cena', 'Festival', 'Finde']
 const categories: Category[] = [
   'Abrigo',

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from './store'
-import type { Sheet } from './types'
+import type { Session, Sheet } from './types'
+import { Auth } from './screens/Auth'
 import { Feed } from './screens/Feed'
 import { Search } from './screens/Search'
 import { Saved } from './screens/Saved'
@@ -22,8 +23,22 @@ import { BottomNav, Toast } from './components/ui'
 
 type Screen = 'feed' | 'search' | 'saved' | 'profile' | 'publish' | 'messages' | 'chat'
 
+const SESSION_KEY = 'tapp-session-v1'
+
+const loadSession = (): Session | null => {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Session
+    return parsed?.name ? parsed : null
+  } catch {
+    return null
+  }
+}
+
 export default function App() {
-  const { toast } = useStore()
+  const { toast, updateProfile } = useStore()
+  const [session, setSession] = useState<Session | null>(loadSession)
   const [screen, setScreen] = useState<Screen>('feed')
   const [feedIndex, setFeedIndex] = useState(0)
   const [sheets, setSheets] = useState<Sheet[]>([])
@@ -46,6 +61,37 @@ export default function App() {
 
   const goTab = (tab: 'feed' | 'search' | 'saved' | 'profile' | 'messages') => {
     setScreen(tab)
+    closeAllSheets()
+  }
+
+  const completeAuth = (next: Session) => {
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(next))
+    } catch {
+      // La sesión también vive en memoria durante esta visita.
+    }
+    if (!next.guest) {
+      updateProfile({
+        name: next.name,
+        handle: next.handle,
+        bio: 'estrenando perfil en tapp.',
+        styles: next.styles,
+      })
+    }
+    setSession(next)
+    setScreen('feed')
+    setFeedIndex(0)
+    closeAllSheets()
+  }
+
+  const logout = () => {
+    try {
+      localStorage.removeItem(SESSION_KEY)
+    } catch {
+      // Sin sesión guardada no hay nada que borrar.
+    }
+    setSession(null)
+    setScreen('feed')
     closeAllSheets()
   }
 
@@ -132,9 +178,7 @@ export default function App() {
       <aside className="stage-copy" aria-hidden="true">
         <span className="stage-kicker">TAPP · PROTOTIPO MÓVIL</span>
         <h1>
-          El look,
-          <br />
-          <em>a tu manera.</em>
+          tapp<em>.</em>
         </h1>
         <p>
           Inspiración, adaptación y compra en un solo recorrido. Probado para
@@ -159,89 +203,99 @@ export default function App() {
             </span>
           </div>
 
-          <div className="view" key={screen}>
-            {screen === 'feed' && (
-              <Feed
-                feedIndex={feedIndex}
-                setFeedIndex={setFeedIndex}
-                onOpenOutfit={openOutfit}
-                onOpenItem={openItem}
-                onOpenWishlist={openWishlist}
-                onShare={openShare}
-                onSearch={() => goTab('search')}
-                onCreator={openCreator}
-                onProfile={() => goTab('profile')}
-              />
-            )}
+          {!session ? (
+            <div className="view">
+              <Auth onComplete={completeAuth} />
+            </div>
+          ) : (
+            <>
+              <div className="view" key={screen}>
+                {screen === 'feed' && (
+                  <Feed
+                    feedIndex={feedIndex}
+                    setFeedIndex={setFeedIndex}
+                    onOpenOutfit={openOutfit}
+                    onOpenItem={openItem}
+                    onOpenWishlist={openWishlist}
+                    onShare={openShare}
+                    onSearch={() => goTab('search')}
+                    onCreator={openCreator}
+                    onProfile={() => goTab('profile')}
+                  />
+                )}
 
-            {screen === 'search' && (
-              <Search
-                onOpenOutfit={openOutfit}
-                onOpenItem={openItem}
-                onOpenCreator={openCreator}
-                onOpenBrand={openBrand}
-              />
-            )}
+                {screen === 'search' && (
+                  <Search
+                    onOpenOutfit={openOutfit}
+                    onOpenItem={openItem}
+                    onOpenCreator={openCreator}
+                    onOpenBrand={openBrand}
+                  />
+                )}
 
-            {screen === 'saved' && (
-              <Saved
-                onOpenOutfit={openOutfit}
-                onOpenItem={openItem}
-                onEditWishlist={openWishlist}
-                onExplore={() => goTab('search')}
-              />
-            )}
+                {screen === 'saved' && (
+                  <Saved
+                    onOpenOutfit={openOutfit}
+                    onOpenItem={openItem}
+                    onEditWishlist={openWishlist}
+                    onExplore={() => goTab('search')}
+                  />
+                )}
 
-            {screen === 'profile' && (
-              <Profile
-                onOpenOutfit={openOutfit}
-                onEditProfile={() => pushSheet({ type: 'edit-profile' })}
-                onOpenFollowers={(kind) => pushSheet({ type: 'followers', kind })}
-              />
-            )}
+                {screen === 'profile' && (
+                  <Profile
+                    onOpenOutfit={openOutfit}
+                    onEditProfile={() => pushSheet({ type: 'edit-profile' })}
+                    onOpenFollowers={(kind) => pushSheet({ type: 'followers', kind })}
+                    onLogout={logout}
+                  />
+                )}
 
-            {screen === 'publish' && (
-              <Publish
-                onBack={() => goTab('feed')}
-                onPublished={() => {
-                  setFeedIndex(0)
-                  goTab('feed')
-                }}
-              />
-            )}
+                {screen === 'publish' && (
+                  <Publish
+                    onBack={() => goTab('feed')}
+                    onPublished={() => {
+                      setFeedIndex(0)
+                      goTab('feed')
+                    }}
+                  />
+                )}
 
-            {(screen === 'messages' || screen === 'chat') && (
-              <Messages
-                activeConversationId={screen === 'chat' ? activeConversationId : null}
-                onOpenConversation={(id) => {
-                  setActiveConversationId(id)
-                  setScreen('chat')
-                }}
-                onBack={() => {
-                  if (screen === 'chat') {
-                    setActiveConversationId(null)
-                    setScreen('messages')
-                  } else {
-                    setScreen('feed')
-                  }
-                }}
-                onOpenOutfit={openOutfit}
-              />
-            )}
-          </div>
+                {(screen === 'messages' || screen === 'chat') && (
+                  <Messages
+                    activeConversationId={screen === 'chat' ? activeConversationId : null}
+                    onOpenConversation={(id) => {
+                      setActiveConversationId(id)
+                      setScreen('chat')
+                    }}
+                    onBack={() => {
+                      if (screen === 'chat') {
+                        setActiveConversationId(null)
+                        setScreen('messages')
+                      } else {
+                        setScreen('feed')
+                      }
+                    }}
+                    onOpenOutfit={openOutfit}
+                  />
+                )}
+              </div>
 
-          {['feed', 'search', 'saved', 'profile', 'messages'].includes(screen) && (
-            <BottomNav
-              current={screen as 'feed' | 'search' | 'saved' | 'profile' | 'messages'}
-              onChange={goTab}
-              onCreate={() => {
-                closeAllSheets()
-                setScreen('publish')
-              }}
-            />
+              {['feed', 'search', 'saved', 'profile', 'messages'].includes(screen) && (
+                <BottomNav
+                  current={screen as 'feed' | 'search' | 'saved' | 'profile' | 'messages'}
+                  onChange={goTab}
+                  onCreate={() => {
+                    closeAllSheets()
+                    setScreen('publish')
+                  }}
+                />
+              )}
+
+              {sheetNode}
+            </>
           )}
 
-          {sheetNode}
           {toast && <Toast key={toast.id} message={toast.message} />}
         </div>
       </div>
