@@ -386,7 +386,7 @@ export function Search({
                     onClick={() => onOpenBrand('nova')}
                   >
                     <span className="drop-banner-image">
-                      <img src="/images/outfits/look-leather.jpg" alt="Drop Piel y perlas de NOVA" />
+                      <img src="images/outfits/look-leather.jpg" alt="Drop Piel y perlas de NOVA" />
                     </span>
                     <span className="drop-banner-copy">
                       <span className="eyebrow">Drop · 12 nov</span>

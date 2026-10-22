@@ -34,12 +34,12 @@ interface PublishProps {
 }
 
 const demoPhotos = [
-  { src: '/images/outfits/look-rugby.jpg', label: 'rayas' },
-  { src: '/images/outfits/look-hoodie.jpg', label: 'gris' },
-  { src: '/images/outfits/look-tee.jpg', label: 'gráfica' },
-  { src: '/images/outfits/look-shelf.jpg', label: 'shelf' },
-  { src: '/images/outfits/look-leather.jpg', label: 'piel' },
-  { src: '/images/outfits/look-seated.jpg', label: 'sombra' },
+  { src: 'images/outfits/look-rugby.jpg', label: 'rayas' },
+  { src: 'images/outfits/look-hoodie.jpg', label: 'gris' },
+  { src: 'images/outfits/look-tee.jpg', label: 'gráfica' },
+  { src: 'images/outfits/look-shelf.jpg', label: 'shelf' },
+  { src: 'images/outfits/look-leather.jpg', label: 'piel' },
+  { src: 'images/outfits/look-seated.jpg', label: 'sombra' },
 ]
 
 const styles: Style[] = ['Minimalista', 'Casual', 'Streetwear', 'Vintage', 'Boho', 'Clásico']
@@ -56,14 +56,14 @@ const categories: Category[] = [
 ]
 
 const fallbackImage: Record<Category, string> = {
-  Abrigo: '/images/items/abrigo-camel.jpg',
-  Top: '/images/items/top-blanco.jpg',
-  Pantalón: '/images/items/jeans-rectos.jpg',
-  Falda: '/images/items/falda-negra.jpg',
-  Vestido: '/images/items/vestido-lila.jpg',
-  Zapatos: '/images/items/zapatillas-blancas.jpg',
-  Bolso: '/images/items/bolso-mini.jpg',
-  Accesorio: '/images/items/gafas-negras.jpg',
+  Abrigo: 'images/items/abrigo-camel.jpg',
+  Top: 'images/items/top-blanco.jpg',
+  Pantalón: 'images/items/jeans-rectos.jpg',
+  Falda: 'images/items/falda-negra.jpg',
+  Vestido: 'images/items/vestido-lila.jpg',
+  Zapatos: 'images/items/zapatillas-blancas.jpg',
+  Bolso: 'images/items/bolso-mini.jpg',
+  Accesorio: 'images/items/gafas-negras.jpg',
 }
 
 export function Publish({ onBack, onPublished }: PublishProps) {

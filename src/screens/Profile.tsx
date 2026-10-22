@@ -58,7 +58,7 @@ export function Profile({
   return (
     <div className="screen screen--light profile-screen">
       <div className="profile-cover">
-        <img src="/images/outfits/look-tee.jpg" alt="" />
+        <img src="images/outfits/look-tee.jpg" alt="" />
         <div className="profile-cover-shade" />
         <button type="button" className="profile-cover-action" onClick={shareProfile} aria-label="Compartir perfil">
           <Share2 size={19} />
@@ -67,7 +67,7 @@ export function Profile({
 
       <div className="profile-scroll">
         <div className="profile-avatar-wrap">
-          <img src="/images/avatars/sofia-profile.jpg" alt={`Foto de ${me.name}`} />
+          <img src="images/avatars/sofia-profile.jpg" alt={`Foto de ${me.name}`} />
           <span className="profile-style-dot" />
         </div>
 

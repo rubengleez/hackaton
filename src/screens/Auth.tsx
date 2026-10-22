@@ -59,12 +59,12 @@ const accountTypes: {
 ]
 
 const styleOptions: { value: Style; image: string; pos?: string }[] = [
-  { value: 'Minimalista', image: '/images/outfits/look-blanco.jpg' },
-  { value: 'Casual', image: '/images/outfits/look-tee.jpg' },
-  { value: 'Streetwear', image: '/images/outfits/look-hoodie.jpg' },
-  { value: 'Vintage', image: '/images/outfits/look-rugby.jpg' },
-  { value: 'Boho', image: '/images/outfits/look-festival.jpg' },
-  { value: 'Clásico', image: '/images/outfits/look-cena.jpg' },
+  { value: 'Minimalista', image: 'images/outfits/look-blanco.jpg' },
+  { value: 'Casual', image: 'images/outfits/look-tee.jpg' },
+  { value: 'Streetwear', image: 'images/outfits/look-hoodie.jpg' },
+  { value: 'Vintage', image: 'images/outfits/look-rugby.jpg' },
+  { value: 'Boho', image: 'images/outfits/look-festival.jpg' },
+  { value: 'Clásico', image: 'images/outfits/look-cena.jpg' },
 ]
 
 const defaultSizes: SessionSizes = { pants: 'M', top: 'M', shoes: '38' }

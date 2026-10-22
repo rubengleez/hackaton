@@ -744,7 +744,7 @@ export function CreatorSheet({
   if (!creator) return null
   const creatorOutfits = outfits.filter((outfit) => outfit.creatorId === creator.id)
   const following = isFollowing(creator.id)
-  const cover = creatorOutfits[0]?.image ?? '/images/outfits/look-tee.jpg'
+  const cover = creatorOutfits[0]?.image ?? 'images/outfits/look-tee.jpg'
 
   return (
     <Sheet full onClose={onClose} className="creator-sheet" hideHandle>

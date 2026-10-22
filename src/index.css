@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'JUST Sans';
-  src: url('/fonts/just-sans-extrabold.woff2') format('woff2');
+  src: url('../fonts/just-sans-extrabold.woff2') format('woff2');
   font-style: normal;
   font-weight: 800;
   font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'DM Serif Display';
-  src: url('/fonts/dm-serif-display.woff2') format('woff2');
+  src: url('../fonts/dm-serif-display.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
   font-family: 'DM Serif Display';
-  src: url('/fonts/dm-serif-display-italic.woff2') format('woff2');
+  src: url('../fonts/dm-serif-display-italic.woff2') format('woff2');
   font-style: italic;
   font-weight: 400;
   font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: 'Manrope';
-  src: url('/fonts/manrope.woff2') format('woff2');
+  src: url('../fonts/manrope.woff2') format('woff2');
   font-style: normal;
   font-weight: 200 900;
   font-display: swap;
@@ -6638,5 +6638,52 @@ select:focus-visible {
 
   .auth-splash {
     padding-top: calc(30px + env(safe-area-inset-top));
+  }
+}
+
+/* PWA instalada en iOS: usamos la barra real del iPhone. */
+@media (display-mode: standalone) {
+  .device-status {
+    display: none;
+  }
+
+  .view {
+    top: env(safe-area-inset-top);
+  }
+
+  .toast {
+    top: calc(env(safe-area-inset-top) + 8px);
+  }
+
+  .phone {
+    height: 100dvh;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .app {
+    background: #000;
+    border-radius: 0;
+  }
+
+  /* la vista ya empieza debajo de la barra real: evitamos sumar el inset dos veces */
+  .feed-topbar {
+    padding-top: 14px;
+  }
+
+  .screen-header {
+    padding-top: 24px;
+  }
+
+  .publish-header {
+    padding-top: 17px;
+  }
+
+  .auth-top {
+    padding-top: 16px;
+  }
+
+  .auth-splash {
+    padding-top: 30px;
   }
 }
