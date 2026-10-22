@@ -1,0 +1,264 @@
+import { useMemo, useState } from 'react'
+import {
+  Bookmark,
+  Grid3X3,
+  Heart,
+  Pencil,
+  RotateCcw,
+  Share2,
+} from 'lucide-react'
+import { useStore } from '../store'
+import {
+  copyText,
+  formatCompact,
+  formatPrice,
+  outfitTotal,
+} from '../utils'
+import { EmptyState } from '../components/ui'
+
+interface ProfileProps {
+  onOpenOutfit: (outfitId: string) => void
+  onOpenItem: (productId: string) => void
+  onEditProfile: () => void
+  onOpenFollowers: (kind: 'followers' | 'following') => void
+}
+
+export function Profile({
+  onOpenOutfit,
+  onOpenItem,
+  onEditProfile,
+  onOpenFollowers,
+}: ProfileProps) {
+  const {
+    state,
+    me,
+    outfits,
+    products,
+    resetDemo,
+    notify,
+  } = useStore()
+  const [tab, setTab] = useState<'looks' | 'inspiration' | 'wishlist'>('looks')
+
+  const myOutfits = useMemo(
+    () => outfits.filter((outfit) => outfit.creatorId === 'me'),
+    [outfits],
+  )
+  const savedOutfits = useMemo(
+    () =>
+      state.saved
+        .map((id) => outfits.find((outfit) => outfit.id === id))
+        .filter(Boolean),
+    [state.saved, outfits],
+  )
+  const wishlist = useMemo(
+    () =>
+      state.wishlist.flatMap((entry) => {
+        const product = products.find((item) => item.id === entry.productId)
+        return product ? [{ entry, product }] : []
+      }),
+    [state.wishlist, products],
+  )
+
+  const shareProfile = async () => {
+    const copied = await copyText(`https://tapp.app/p/${me.handle}`)
+    notify(copied ? 'Enlace del perfil copiado' : 'No se pudo copiar el enlace')
+  }
+
+  return (
+    <div className="screen screen--light profile-screen">
+      <div className="profile-cover">
+        <img src="/images/outfits/look-tee.jpg" alt="" />
+        <div className="profile-cover-shade" />
+        <button type="button" className="profile-cover-action" onClick={shareProfile} aria-label="Compartir perfil">
+          <Share2 size={19} />
+        </button>
+      </div>
+
+      <div className="profile-scroll">
+        <div className="profile-avatar-wrap">
+          <img src={me.avatar} alt={`Foto de ${me.name}`} />
+          <span className="profile-style-dot" />
+        </div>
+
+        <div className="profile-intro">
+          <h1>{me.name}</h1>
+          <span>@{me.handle} · {me.location}</span>
+          <p>{me.bio}</p>
+          <div className="profile-tags">
+            {me.styles.map((style) => (
+              <span key={style}>{style}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-stats">
+          <button type="button" onClick={() => setTab('looks')}>
+            <strong>{myOutfits.length}</strong>
+            <span>looks</span>
+          </button>
+          <button type="button" onClick={() => onOpenFollowers('followers')}>
+            <strong>{formatCompact(me.followers)}</strong>
+            <span>seguidores</span>
+          </button>
+          <button type="button" onClick={() => onOpenFollowers('following')}>
+            <strong>{formatCompact(me.following)}</strong>
+            <span>seguidos</span>
+          </button>
+        </div>
+
+        <div className="profile-actions">
+          <button type="button" className="button button--outline" onClick={onEditProfile}>
+            <Pencil size={15} /> Editar perfil
+          </button>
+          <button type="button" className="button button--dark" onClick={shareProfile}>
+            <Share2 size={15} /> Compartir
+          </button>
+        </div>
+
+        <div className="profile-demo-note">
+          <span>
+            <RotateCcw size={14} />
+            Demo con datos guardados en este navegador
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              resetDemo()
+              notify('Demo reiniciada')
+            }}
+          >
+            Reiniciar
+          </button>
+        </div>
+
+        <div className="profile-tabs" role="tablist" aria-label="Contenido del perfil">
+          <button
+            type="button"
+            className={tab === 'looks' ? 'is-active' : ''}
+            onClick={() => setTab('looks')}
+            role="tab"
+            aria-selected={tab === 'looks'}
+          >
+            <Grid3X3 size={16} /> Looks
+          </button>
+          <button
+            type="button"
+            className={tab === 'inspiration' ? 'is-active' : ''}
+            onClick={() => setTab('inspiration')}
+            role="tab"
+            aria-selected={tab === 'inspiration'}
+          >
+            <Bookmark size={16} /> Inspiración
+          </button>
+          <button
+            type="button"
+            className={tab === 'wishlist' ? 'is-active' : ''}
+            onClick={() => setTab('wishlist')}
+            role="tab"
+            aria-selected={tab === 'wishlist'}
+          >
+            <Heart size={16} /> Wishlist
+          </button>
+        </div>
+
+        {tab === 'looks' && (
+          <div className="profile-content">
+            {myOutfits.length === 0 ? (
+              <EmptyState
+                icon={<Grid3X3 size={26} />}
+                title="Tu primer look te espera"
+                text="Publica una foto, añade las prendas y compártela con la comunidad."
+              />
+            ) : (
+              <div className="profile-look-grid">
+                {myOutfits.map((outfit) => (
+                  <button
+                    type="button"
+                    key={outfit.id}
+                    className="profile-look"
+                    onClick={() => onOpenOutfit(outfit.id)}
+                  >
+                    <img
+                      src={outfit.image}
+                      alt={outfit.title}
+                      style={{ objectPosition: outfit.imagePos }}
+                    />
+                    <span className="profile-look-overlay">
+                      <strong>{outfit.title}</strong>
+                      <em>{formatPrice(outfitTotal(outfit, products))}</em>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'inspiration' && (
+          <div className="profile-content">
+            {savedOutfits.length === 0 ? (
+              <EmptyState
+                icon={<Bookmark size={26} />}
+                title="Nada guardado todavía"
+                text="La inspiración es para los looks completos que quieres recordar."
+              />
+            ) : (
+              <div className="profile-saved-grid">
+                {savedOutfits.map((outfit) =>
+                  outfit ? (
+                    <button
+                      type="button"
+                      key={outfit.id}
+                      onClick={() => onOpenOutfit(outfit.id)}
+                    >
+                      <img
+                        src={outfit.image}
+                        alt={outfit.title}
+                        style={{ objectPosition: outfit.imagePos }}
+                      />
+                      <span>{outfit.title}</span>
+                    </button>
+                  ) : null,
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'wishlist' && (
+          <div className="profile-content">
+            {wishlist.length === 0 ? (
+              <EmptyState
+                icon={<Heart size={26} />}
+                title="Aún no quieres nada concreto"
+                text="Cuando te guste una prenda, guárdala con talla, color y una nota."
+              />
+            ) : (
+              <div className="profile-wishlist">
+                {wishlist.map(({ entry, product }) => (
+                  <button
+                    type="button"
+                    className="profile-wishlist-row"
+                    key={product.id}
+                    onClick={() => onOpenItem(product.id)}
+                  >
+                    <img src={product.image} alt="" style={{ objectPosition: product.imagePos }} />
+                    <span>
+                      <em>{product.brand}</em>
+                      <strong>{product.name}</strong>
+                      <small>
+                        {entry.size ? `Talla ${entry.size} · ` : ''}
+                        {entry.color ?? ''}
+                      </small>
+                    </span>
+                    <b>{formatPrice(product.price)}</b>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
