@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from './store'
 import type { Session, Sheet } from './types'
 import { Auth } from './screens/Auth'
@@ -36,13 +36,26 @@ const loadSession = (): Session | null => {
   }
 }
 
+const getPhoneScale = () => {
+  if (typeof window === 'undefined' || window.innerWidth <= 600) return 1
+  const available = window.innerHeight - 44
+  return Math.min(1, Math.max(0.5, available / 882))
+}
+
 export default function App() {
   const { toast, updateProfile } = useStore()
   const [session, setSession] = useState<Session | null>(loadSession)
+  const [phoneScale, setPhoneScale] = useState(getPhoneScale)
   const [screen, setScreen] = useState<Screen>('feed')
   const [feedIndex, setFeedIndex] = useState(0)
   const [sheets, setSheets] = useState<Sheet[]>([])
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const onResize = () => setPhoneScale(getPhoneScale())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const pushSheet = (sheet: Sheet) => setSheets((prev) => [...prev, sheet])
   const closeSheet = () => setSheets((prev) => prev.slice(0, -1))
@@ -196,8 +209,19 @@ export default function App() {
         </div>
       </aside>
 
-      <div className="phone">
-        <div className="app">
+      <div
+        className="phone-slot"
+        style={{ width: 414 * phoneScale, height: 882 * phoneScale }}
+      >
+        <div
+          className="phone"
+          style={
+            phoneScale === 1
+              ? undefined
+              : { transform: `scale(${phoneScale})`, transformOrigin: 'top left' }
+          }
+        >
+          <div className="app">
           {!session ? (
             <Auth onComplete={completeAuth} />
           ) : (
@@ -290,6 +314,7 @@ export default function App() {
             </>
           )}
           {toast && <Toast key={toast.id} message={toast.message} />}
+        </div>
         </div>
       </div>
 

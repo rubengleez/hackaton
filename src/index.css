@@ -309,9 +309,15 @@ select:focus-visible {
   z-index: 1;
 }
 
+.phone-slot {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
 .phone {
   width: 414px;
-  height: min(882px, calc(100dvh - 44px));
+  height: 882px;
   border-radius: 48px;
   padding: 7px;
   background: #171410;
@@ -5647,6 +5653,11 @@ select:focus-visible {
     display: none;
   }
 
+  .phone-slot {
+    width: 100% !important;
+    height: 100dvh !important;
+  }
+
   .phone {
     width: 100%;
     height: 100dvh;
@@ -5655,6 +5666,7 @@ select:focus-visible {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+    transform: none !important;
   }
 
   .app {
@@ -5667,10 +5679,6 @@ select:focus-visible {
 }
 
 @media (max-height: 700px) and (min-width: 601px) {
-  .phone {
-    height: calc(100dvh - 24px);
-  }
-
   .feed-title {
     font-size: 30px;
   }
@@ -6338,7 +6346,7 @@ select:focus-visible {
   gap: 9px;
 }
 
-@media (max-height: 760px) {
+@media (max-width: 600px) and (max-height: 760px) {
   .auth-top {
     padding: 14px 20px 0;
   }
@@ -6461,3 +6469,25 @@ select:focus-visible {
   }
 }
 
+
+@media (max-width: 600px) {
+  .feed-topbar {
+    padding-top: calc(14px + env(safe-area-inset-top));
+  }
+
+  .screen-header {
+    padding-top: calc(24px + env(safe-area-inset-top));
+  }
+
+  .publish-header {
+    padding-top: calc(17px + env(safe-area-inset-top));
+  }
+
+  .auth-top {
+    padding-top: calc(16px + env(safe-area-inset-top));
+  }
+
+  .auth-splash {
+    padding-top: calc(30px + env(safe-area-inset-top));
+  }
+}
