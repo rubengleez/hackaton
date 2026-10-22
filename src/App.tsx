@@ -44,13 +44,8 @@ export default function App() {
   const openCreator = (creatorId: string) => pushSheet({ type: 'creator', creatorId })
   const openBrand = (brandId: string) => pushSheet({ type: 'brand', brandId })
 
-  const goTab = (tab: 'feed' | 'search' | 'saved' | 'profile') => {
+  const goTab = (tab: 'feed' | 'search' | 'saved' | 'profile' | 'messages') => {
     setScreen(tab)
-    closeAllSheets()
-  }
-
-  const openMessages = () => {
-    setScreen('messages')
     closeAllSheets()
   }
 
@@ -163,7 +158,7 @@ export default function App() {
                 onOpenItem={openItem}
                 onOpenWishlist={openWishlist}
                 onShare={openShare}
-                onMessages={openMessages}
+                onSearch={() => goTab('search')}
                 onCreator={openCreator}
                 onProfile={() => goTab('profile')}
               />
@@ -226,9 +221,9 @@ export default function App() {
             )}
           </div>
 
-          {['feed', 'search', 'saved', 'profile'].includes(screen) && (
+          {['feed', 'search', 'saved', 'profile', 'messages'].includes(screen) && (
             <BottomNav
-              current={screen as 'feed' | 'search' | 'saved' | 'profile'}
+              current={screen as 'feed' | 'search' | 'saved' | 'profile' | 'messages'}
               onChange={goTab}
               onCreate={() => {
                 closeAllSheets()

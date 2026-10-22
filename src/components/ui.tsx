@@ -3,8 +3,8 @@ import {
   Bookmark,
   Check,
   Home,
+  MessageCircle,
   Plus,
-  Search,
   User,
   X,
 } from 'lucide-react'
@@ -198,7 +198,7 @@ export function EmptyState({
   )
 }
 
-export type Tab = 'feed' | 'search' | 'saved' | 'profile'
+export type Tab = 'feed' | 'search' | 'saved' | 'profile' | 'messages'
 
 export function BottomNav({
   current,
@@ -211,7 +211,7 @@ export function BottomNav({
 }) {
   const items = [
     { id: 'feed' as const, icon: Home, label: 'main' },
-    { id: 'search' as const, icon: Search, label: 'buscar' },
+    { id: 'messages' as const, icon: MessageCircle, label: 'mensajes' },
     { id: 'saved' as const, icon: Bookmark, label: 'wishlist' },
     { id: 'profile' as const, icon: User, label: 'perfil' },
   ]
