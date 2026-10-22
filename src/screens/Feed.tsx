@@ -53,16 +53,28 @@ export function Feed({
     me,
     isLiked,
     isSaved,
-    isFollowing,
     toggleLike,
     toggleSaved,
-    toggleFollow,
+    addWishlist,
     notify,
   } = useStore()
   const scrollRef = useRef<HTMLDivElement>(null)
+  const screenRef = useRef<HTMLDivElement>(null)
+  const dragStart = useRef<number | null>(null)
   const [mode, setMode] = useState<FeedMode>('forYou')
   const [activeSpot, setActiveSpot] = useState<ActiveSpot | null>(null)
   const [selectedSize, setSelectedSize] = useState('')
+  const [dragX, setDragX] = useState(0)
+  const [saving, setSaving] = useState(false)
+  const [flying, setFlying] = useState<{
+    left: number
+    top: number
+    width: number
+    height: number
+    dx: number
+    dy: number
+    go: boolean
+  } | null>(null)
 
   const forYou = [
     ...state.published,
@@ -76,15 +88,6 @@ export function Feed({
   )
 
   const feed = mode === 'forYou' ? forYou : following
-
-  const currentOutfit =
-    feed.length > 0 ? feed[Math.min(feedIndex, feed.length - 1)] : undefined
-  const currentCreator = currentOutfit
-    ? creators.find((creator) => creator.id === currentOutfit.creatorId) ?? me
-    : undefined
-  const currentFollowing = currentCreator
-    ? isFollowing(currentCreator.id)
-    : false
 
   const activeOutfit = activeSpot
     ? feed.find((outfit) => outfit.id === activeSpot.outfitId)
@@ -123,7 +126,69 @@ export function Feed({
   const handleSave = (outfit: Outfit) => {
     const wasSaved = isSaved(outfit.id)
     toggleSaved(outfit.id)
-    notify(wasSaved ? 'Quitado de Inspiración' : 'Look guardado en Inspiración')
+    notify(wasSaved ? 'quitado de inspiración' : 'look guardado en inspiración')
+  }
+
+  const saveToWishlist = () => {
+    if (!activeItem || saving) return
+    const screenRect = screenRef.current?.getBoundingClientRect()
+    const imageEl = document.querySelector<HTMLImageElement>('.island-hero img')
+    const navEl = document.querySelector<HTMLElement>('[data-nav="wishlist"]')
+
+    if (screenRect && imageEl && navEl) {
+      const imageRect = imageEl.getBoundingClientRect()
+      const navRect = navEl.getBoundingClientRect()
+      setFlying({
+        left: imageRect.left - screenRect.left,
+        top: imageRect.top - screenRect.top,
+        width: imageRect.width,
+        height: imageRect.height,
+        dx: navRect.left + navRect.width / 2 - (imageRect.left + imageRect.width / 2),
+        dy: navRect.top + navRect.height / 2 - (imageRect.top + imageRect.height / 2),
+        go: false,
+      })
+      navEl.classList.add('is-receiving')
+      window.setTimeout(() => navEl.classList.remove('is-receiving'), 900)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() =>
+          setFlying((current) => (current ? { ...current, go: true } : current)),
+        )
+      })
+    }
+
+    setSaving(true)
+    setDragX(0)
+    window.setTimeout(() => {
+      addWishlist({
+        productId: activeItem.id,
+        size: selectedSize || activeSizes[0],
+        color: activeItem.color,
+        note: '',
+      })
+      notify('añadido a wishlist')
+      setActiveSpot(null)
+      setSaving(false)
+      setFlying(null)
+    }, 900)
+  }
+
+  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragStart.current = event.clientX
+    setDragX(0)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  const moveDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragStart.current === null) return
+    const distance = Math.max(0, event.clientX - dragStart.current)
+    setDragX(Math.min(150, distance))
+  }
+
+  const endDrag = () => {
+    if (dragStart.current === null) return
+    dragStart.current = null
+    if (dragX >= 82) saveToWishlist()
+    else setDragX(0)
   }
 
   const spotsFor = (outfit: Outfit) => {
@@ -139,7 +204,7 @@ export function Feed({
   }
 
   return (
-    <div className="screen screen--feed">
+    <div className="screen screen--feed" ref={screenRef}>
       <header className="feed-topbar">
         <div className="feed-brandline">
           <div className="wordmark">
@@ -162,7 +227,7 @@ export function Feed({
               aria-label="tu perfil"
               onClick={onProfile}
             >
-              <Avatar creator={me} size={31} />
+              <Avatar creator={me} size={27} />
             </button>
           </div>
         </div>
@@ -188,42 +253,6 @@ export function Feed({
           </button>
         </div>
 
-        {currentOutfit && currentCreator && (
-          <div className="feed-creatorbar">
-            <button
-              type="button"
-              className="creator-line"
-              onClick={() => onCreator(currentCreator.id)}
-            >
-              <Avatar creator={currentCreator} size={29} />
-              <strong>
-                {currentCreator.name}
-                {currentCreator.verified && <i className="verified">✓</i>}
-              </strong>
-            </button>
-            {currentCreator.id !== 'me' && (
-              <button
-                type="button"
-                className={`follow-mini ${currentFollowing ? 'is-following' : ''}`}
-                onClick={() => {
-                  toggleFollow(currentCreator.id)
-                  notify(
-                    currentFollowing
-                      ? `dejaste de seguir a ${currentCreator.name}`
-                      : `ahora sigues a ${currentCreator.name}`,
-                  )
-                }}
-                aria-label={
-                  currentFollowing
-                    ? `dejar de seguir a ${currentCreator.name}`
-                    : `seguir a ${currentCreator.name}`
-                }
-              >
-                {currentFollowing ? 'siguiendo' : 'seguir'}
-              </button>
-            )}
-          </div>
-        )}
       </header>
 
       {feed.length === 0 ? (
@@ -250,7 +279,6 @@ export function Feed({
                   alt={`Look de ${creator.name}`}
                   style={{ objectPosition: outfit.imagePos }}
                 />
-
 
                 <div className="tapp-spots">
                   {spots.map((spot) => {
@@ -283,6 +311,15 @@ export function Feed({
                 </div>
 
                 <div className="feed-rail">
+                  <button
+                    type="button"
+                    className="rail-avatar"
+                    onClick={() => onCreator(creator.id)}
+                    aria-label={`perfil de ${creator.name}`}
+                  >
+                    <Avatar creator={creator} size={34} />
+                  </button>
+
                   <button
                     type="button"
                     className={`rail-button ${liked ? 'is-liked' : ''}`}
@@ -327,7 +364,7 @@ export function Feed({
             onClick={() => setActiveSpot(null)}
           />
           <section
-            className="tapp-island"
+            className={`tapp-island ${saving ? 'is-saving' : ''}`}
             aria-label={`${activeItem.name}, ${activeItem.brand}`}
           >
             <button
@@ -339,12 +376,28 @@ export function Feed({
               <X size={16} />
             </button>
 
-            <div className="island-hero">
+            <div
+              className={`island-hero ${dragX > 0 ? 'is-dragging' : ''} ${dragX >= 82 ? 'is-ready' : ''}`}
+              style={{ transform: `translateX(${dragX}px) rotate(${dragX * 0.025}deg)` }}
+              onPointerDown={startDrag}
+              onPointerMove={moveDrag}
+              onPointerUp={endDrag}
+              onPointerCancel={() => {
+                dragStart.current = null
+                setDragX(0)
+              }}
+              aria-label="haz scroll a la derecha para guardar en wishlist"
+            >
               <img
                 src={activeItem.image}
                 alt={activeItem.name}
                 style={{ objectPosition: activeItem.imagePos }}
               />
+              {dragX > 0 && (
+                <span className="island-swipe-target">
+                  <Heart size={13} /> wishlist
+                </span>
+              )}
             </div>
 
             <div className="island-body">
@@ -356,6 +409,11 @@ export function Feed({
                   {activeItem.category} · {activeItem.color}
                 </small>
               </div>
+
+              <p className="island-swipe-hint">
+                haz scroll a la derecha para guardar en wishlist
+                <span>→</span>
+              </p>
 
               <div className="island-sizes" aria-label="tallas">
                 {activeSizes.map((size) => (
@@ -423,6 +481,25 @@ export function Feed({
               </button>
             </div>
           </section>
+
+          {flying && (
+            <img
+              className="flying-wish"
+              src={activeItem.image}
+              alt=""
+              aria-hidden="true"
+              style={{
+                left: flying.left,
+                top: flying.top,
+                width: flying.width,
+                height: flying.height,
+                transform: flying.go
+                  ? `translate(${flying.dx}px, ${flying.dy}px) scale(0.12)`
+                  : 'translate(0, 0) scale(1)',
+                opacity: flying.go ? 0.15 : 1,
+              }}
+            />
+          )}
         </>
       )}
     </div>

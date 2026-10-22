@@ -149,6 +149,16 @@ export default function App() {
 
       <div className="phone">
         <div className="app">
+          <div className="device-status" aria-hidden="true">
+            <span className="status-time">9:41</span>
+            <span className="dynamic-island">
+              <i />
+            </span>
+            <span className="status-battery">
+              <i />
+            </span>
+          </div>
+
           <div className="view" key={screen}>
             {screen === 'feed' && (
               <Feed

@@ -222,6 +222,7 @@ export function BottomNav({
         <NavItem
           key={item.id}
           {...item}
+          navKey={item.id}
           active={current === item.id}
           onClick={() => onChange(item.id)}
         />
@@ -232,12 +233,13 @@ export function BottomNav({
         onClick={onCreate}
         aria-label="publicar look"
       >
-        <Plus size={24} strokeWidth={2.4} />
+        <Plus size={21} strokeWidth={2.4} />
       </button>
       {items.slice(2).map((item) => (
         <NavItem
           key={item.id}
           {...item}
+          navKey={item.id}
           active={current === item.id}
           onClick={() => onChange(item.id)}
         />
@@ -249,11 +251,13 @@ export function BottomNav({
 function NavItem({
   icon: Icon,
   label,
+  navKey,
   active,
   onClick,
 }: {
   icon: typeof Home
   label: string
+  navKey: string
   active: boolean
   onClick: () => void
 }) {
@@ -263,6 +267,7 @@ function NavItem({
       className={cn('nav-item', active && 'is-active')}
       onClick={onClick}
       aria-label={label}
+      data-nav={navKey}
     >
       <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
     </button>

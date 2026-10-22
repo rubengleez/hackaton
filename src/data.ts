@@ -18,7 +18,7 @@ const parfois = (q: string) => `https://www.parfois.com/es/es/search?q=${encodeU
 const charles = (q: string) => `https://www.charleskeith.com/es/search?q=${encodeURIComponent(q)}`
 const drmartens = (q: string) => `https://www.drmartens.com/es/es/search?q=${encodeURIComponent(q)}`
 
-export const products: Product[] = [
+const baseProducts: Product[] = [
   {
     id: 'abrigo-camel',
     name: 'Abrigo camel largo',
@@ -1100,6 +1100,65 @@ export const products: Product[] = [
   },
 ]
 
+const familyMap: Record<string, string> = {
+  'jersey-rugby': 'rugby',
+  'jeans-rugby': 'baggy-azul',
+  'bolso-denim': 'tote-denim',
+  'botas-camel': 'botas-camel',
+  'sudadera-gris-oversize': 'sudadera-gris',
+  'jeans-negros-baggy': 'baggy-negro',
+  'botas-platform': 'botas-platform',
+  'camiseta-grafica': 'camiseta-grafica',
+  'jeans-grises': 'baggy-gris',
+  'zapatillas-amarillas': 'zapatillas-amarillas',
+  'gorra-negra': 'gorra',
+  'jeans-gastados': 'jeans-gastado',
+  'cazadora-marron': 'cazadora-piel',
+  'sudadera-blanca': 'sudadera-blanca',
+  'jeans-negros': 'jeans-negro',
+  'collar-perlas': 'collar',
+  'sudadera-negra': 'sudadera-negra',
+  'jeans-claros': 'jeans-claro',
+  'gorro-negro': 'gorro',
+  'cazadora-negra': 'cazadora',
+  'camiseta-negra': 'camiseta-negra',
+  'gafas-negras': 'gafas',
+  'bolso-negro': 'bolso-negro',
+  'camiseta-blanca': 'camiseta-blanca',
+}
+
+const budgetBrands: Record<string, string> = {
+  Abrigo: 'Mango',
+  Top: 'H&M',
+  Pantalón: 'Weekday',
+  Falda: 'H&M',
+  Vestido: 'H&M',
+  Zapatos: 'H&M',
+  Bolso: 'Parfois',
+  Accesorio: 'H&M',
+}
+
+const heroProducts = baseProducts.map((product) =>
+  familyMap[product.id] ? { ...product, family: familyMap[product.id] } : product,
+)
+
+const budgetVersions: Product[] = Object.entries(familyMap).map(([id, family]) => {
+  const base = heroProducts.find((product) => product.id === id)
+  if (!base) throw new Error(`Missing product ${id}`)
+  return {
+    ...base,
+    id: `${id}-basico`,
+    name: `${base.name} básico`,
+    brand: budgetBrands[base.category] ?? 'H&M',
+    price: Math.max(7.95, Math.round(base.price * 0.45) + 0.95),
+    link: `https://www2.hm.com/es_es/search-results.html?q=${encodeURIComponent(base.name)}`,
+    tier: 'budget' as const,
+    family,
+  }
+})
+
+export const products: Product[] = [...heroProducts, ...budgetVersions]
+
 export const creators: Creator[] = [
   {
     id: 'me',
@@ -1188,6 +1247,7 @@ export const outfits: Outfit[] = [
     creatorId: 'lucia',
     image: '/images/outfits/look-rugby.jpg',
     imagePos: 'center 35%',
+    imageAspect: '736 / 981',
     title: 'rugby de rayas',
     description: 'rayas, denim y botas. un clásico de campus que no pasa de moda.',
     occasion: 'Universidad',
@@ -1208,6 +1268,7 @@ export const outfits: Outfit[] = [
     creatorId: 'me',
     image: '/images/outfits/look-hoodie.jpg',
     imagePos: 'center 18%',
+    imageAspect: '736 / 1308',
     title: 'gris de espejo',
     description: 'sudadera oversize, denim negro y platform. cómodo, sin esfuerzo.',
     occasion: 'Finde',
@@ -1226,6 +1287,7 @@ export const outfits: Outfit[] = [
     creatorId: 'elena',
     image: '/images/outfits/look-tee.jpg',
     imagePos: 'center 18%',
+    imageAspect: '736 / 1308',
     title: 'gráfica y baggy',
     description: 'camiseta gráfica, denim gris y unas sambas que lo cambian todo.',
     occasion: 'Festival',
@@ -1245,6 +1307,7 @@ export const outfits: Outfit[] = [
     creatorId: 'marcos',
     image: '/images/outfits/look-shelf.jpg',
     imagePos: 'center 22%',
+    imageAspect: '1199 / 2015',
     title: 'cap y denim',
     description: 'gorra, cazadora negra y denim gastado. la pared de sneakers ya habla sola.',
     occasion: 'Universidad',
@@ -1265,6 +1328,7 @@ export const outfits: Outfit[] = [
     creatorId: 'diego',
     image: '/images/outfits/look-leather.jpg',
     imagePos: 'center 18%',
+    imageAspect: '1080 / 1920',
     title: 'piel y perlas',
     description: 'cazadora marrón, capas blancas y perlas. contraste de espejo.',
     occasion: 'Cena',
@@ -1285,6 +1349,7 @@ export const outfits: Outfit[] = [
     creatorId: 'marcos',
     image: '/images/outfits/look-seated.jpg',
     imagePos: 'center 20%',
+    imageAspect: '1057 / 1922',
     title: 'sombra y denim',
     description: 'cazadora de piel, capucha y denim claro. sentado donde te apetezca.',
     occasion: 'Festival',

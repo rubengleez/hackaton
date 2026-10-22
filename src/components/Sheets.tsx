@@ -211,13 +211,18 @@ export function BudgetSheet({
 }) {
   const { outfitById, products, state, toggleSaved, notify } = useStore()
   const outfit = outfitById(outfitId)
-  const [budget, setBudget] = useState(100)
+  const estimate = outfit ? outfitTotal(outfit, products) : 0
+  const [budget, setBudget] = useState(() =>
+    Math.max(60, Math.round((estimate * 0.55) / 10) * 10),
+  )
   if (!outfit) return null
   const total = outfitTotal(outfit, products)
   const max = Math.max(120, Math.ceil(total / 20) * 20)
   const result = buildBudgetLook(outfit, products, budget)
   const saved = state.saved.includes(outfit.id)
-  const quickBudgets = [80, 100, 150, 200].filter((value) => value <= max)
+  const quickBudgets = [0.4, 0.55, 0.7, 0.85]
+    .map((ratio) => Math.round((total * ratio) / 10) * 10)
+    .filter((value, index, values) => value <= max && values.indexOf(value) === index)
   const swaps = result.swaps
 
   return (

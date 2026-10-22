@@ -19,10 +19,13 @@ export interface BudgetLook {
 
 const styleScore = (candidate: Product, original: Product, outfit: Outfit) => {
   let score = 0
-  if (candidate.style === outfit.style) score += 10
-  if (candidate.style === original.style) score += 3
-  if (candidate.color === original.color) score += 2
-  if (candidate.id === original.id) score += 4
+  if (candidate.family && original.family) {
+    score += candidate.family === original.family ? 60 : -20
+  }
+  if (candidate.style === outfit.style) score += 12
+  if (candidate.style === original.style) score += 4
+  if (candidate.color === original.color) score += 4
+  if (candidate.id === original.id) score += 6
   if (candidate.tier === 'premium') score += 1
   return score
 }
@@ -31,10 +34,14 @@ export function cheapestTotal(outfit: Outfit, products: Product[]) {
   const originals = productsForOutfit(outfit, products)
   const used = new Set<string>()
   return originals.reduce((sum, original) => {
-    const options = products
-      .filter((product) => product.category === original.category)
-      .sort((a, b) => a.price - b.price)
-    const chosen = options.find((option) => !used.has(option.id)) ?? original
+    const options = products.filter((product) => product.category === original.category)
+    const familyOptions = original.family
+      ? options.filter((product) => product.family === original.family)
+      : []
+    const pool = (familyOptions.length > 0 ? familyOptions : options).sort(
+      (a, b) => a.price - b.price,
+    )
+    const chosen = pool.find((option) => !used.has(option.id)) ?? original
     used.add(chosen.id)
     return sum + chosen.price
   }, 0)
@@ -45,16 +52,22 @@ export function alternativesForItem(
   products: Product[],
   maxPrice: number,
 ) {
-  return products
-    .filter(
-      (candidate) =>
-        candidate.category === product.category &&
-        candidate.price <= maxPrice &&
-        candidate.price < product.price,
-    )
+  const categoryPool = products.filter(
+    (candidate) =>
+      candidate.category === product.category &&
+      candidate.price <= maxPrice &&
+      candidate.price < product.price,
+  )
+  const familyPool = product.family
+    ? categoryPool.filter((candidate) => candidate.family === product.family)
+    : []
+  const pool = familyPool.length > 0 ? familyPool : categoryPool
+
+  return pool
     .sort(
       (a, b) =>
         Number(b.style === product.style) - Number(a.style === product.style) ||
+        Number(b.color === product.color) - Number(a.color === product.color) ||
         b.price - a.price,
     )
     .slice(0, 6)
@@ -140,10 +153,14 @@ export function buildBudgetLook(
 
   const used = new Set<string>()
   const cheapest = originals.map((original) => {
-    const options = products
-      .filter((product) => product.category === original.category)
-      .sort((a, b) => a.price - b.price)
-    const chosen = options.find((option) => !used.has(option.id)) ?? original
+    const options = products.filter((product) => product.category === original.category)
+    const familyOptions = original.family
+      ? options.filter((product) => product.family === original.family)
+      : []
+    const pool = (familyOptions.length > 0 ? familyOptions : options).sort(
+      (a, b) => a.price - b.price,
+    )
+    const chosen = pool.find((option) => !used.has(option.id)) ?? original
     used.add(chosen.id)
     return chosen
   })

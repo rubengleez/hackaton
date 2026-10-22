@@ -26,6 +26,7 @@ export interface Product {
   imagePos?: string
   link: string
   tier: Tier
+  family?: string
 }
 
 export interface Creator {
@@ -52,6 +53,7 @@ export interface Outfit {
   creatorId: string
   image: string
   imagePos?: string
+  imageAspect?: string
   title: string
   description: string
   occasion: Occasion
