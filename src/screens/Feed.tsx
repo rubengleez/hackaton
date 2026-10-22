@@ -3,7 +3,7 @@ import {
   ArrowUpRight,
   Bookmark,
   Heart,
-  MessageCircle,
+  Search as SearchIcon,
   Send,
   Sparkles,
   X,
@@ -18,7 +18,7 @@ interface FeedProps {
   onOpenItem: (productId: string, focusBudget?: boolean) => void
   onOpenWishlist: (productId: string) => void
   onShare: (outfitId: string) => void
-  onMessages: () => void
+  onSearch: () => void
   onCreator: (creatorId: string) => void
   onProfile: () => void
   feedIndex: number
@@ -39,7 +39,7 @@ export function Feed({
   onOpenItem,
   onOpenWishlist,
   onShare,
-  onMessages,
+  onSearch,
   onCreator,
   onProfile,
   feedIndex,
@@ -151,10 +151,10 @@ export function Feed({
             <button
               type="button"
               className="feed-top-button"
-              aria-label="mensajes"
-              onClick={onMessages}
+              aria-label="buscar"
+              onClick={onSearch}
             >
-              <MessageCircle size={18} />
+              <SearchIcon size={18} />
             </button>
             <button
               type="button"
