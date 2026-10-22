@@ -195,7 +195,6 @@ export default function App() {
             {screen === 'profile' && (
               <Profile
                 onOpenOutfit={openOutfit}
-                onOpenItem={openItem}
                 onEditProfile={() => pushSheet({ type: 'edit-profile' })}
                 onOpenFollowers={(kind) => pushSheet({ type: 'followers', kind })}
               />

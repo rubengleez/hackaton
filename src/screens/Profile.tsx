@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
 import {
-  Bookmark,
-  Grid3X3,
   Heart,
   Pencil,
   RotateCcw,
   Share2,
+  Shirt,
 } from 'lucide-react'
 import { useStore } from '../store'
 import {
@@ -18,14 +17,12 @@ import { EmptyState } from '../components/ui'
 
 interface ProfileProps {
   onOpenOutfit: (outfitId: string) => void
-  onOpenItem: (productId: string) => void
   onEditProfile: () => void
   onOpenFollowers: (kind: 'followers' | 'following') => void
 }
 
 export function Profile({
   onOpenOutfit,
-  onOpenItem,
   onEditProfile,
   onOpenFollowers,
 }: ProfileProps) {
@@ -37,7 +34,7 @@ export function Profile({
     resetDemo,
     notify,
   } = useStore()
-  const [tab, setTab] = useState<'looks' | 'inspiration' | 'wishlist'>('looks')
+  const [tab, setTab] = useState<'outfits' | 'favoritos'>('outfits')
 
   const myOutfits = useMemo(
     () => outfits.filter((outfit) => outfit.creatorId === 'me'),
@@ -49,14 +46,6 @@ export function Profile({
         .map((id) => outfits.find((outfit) => outfit.id === id))
         .filter(Boolean),
     [state.saved, outfits],
-  )
-  const wishlist = useMemo(
-    () =>
-      state.wishlist.flatMap((entry) => {
-        const product = products.find((item) => item.id === entry.productId)
-        return product ? [{ entry, product }] : []
-      }),
-    [state.wishlist, products],
   )
 
   const shareProfile = async () => {
@@ -76,7 +65,7 @@ export function Profile({
 
       <div className="profile-scroll">
         <div className="profile-avatar-wrap">
-          <img src={me.avatar} alt={`Foto de ${me.name}`} />
+          <img src="/images/avatars/sofia-profile.jpg" alt={`Foto de ${me.name}`} />
           <span className="profile-style-dot" />
         </div>
 
@@ -92,9 +81,9 @@ export function Profile({
         </div>
 
         <div className="profile-stats">
-          <button type="button" onClick={() => setTab('looks')}>
+          <button type="button" onClick={() => setTab('outfits')}>
             <strong>{myOutfits.length}</strong>
-            <span>looks</span>
+            <span>outfits</span>
           </button>
           <button type="button" onClick={() => onOpenFollowers('followers')}>
             <strong>{formatCompact(me.followers)}</strong>
@@ -134,39 +123,30 @@ export function Profile({
         <div className="profile-tabs" role="tablist" aria-label="Contenido del perfil">
           <button
             type="button"
-            className={tab === 'looks' ? 'is-active' : ''}
-            onClick={() => setTab('looks')}
+            className={tab === 'outfits' ? 'is-active' : ''}
+            onClick={() => setTab('outfits')}
             role="tab"
-            aria-selected={tab === 'looks'}
+            aria-selected={tab === 'outfits'}
           >
-            <Grid3X3 size={16} /> Looks
+            <Shirt size={16} /> Outfits
           </button>
           <button
             type="button"
-            className={tab === 'inspiration' ? 'is-active' : ''}
-            onClick={() => setTab('inspiration')}
+            className={tab === 'favoritos' ? 'is-active' : ''}
+            onClick={() => setTab('favoritos')}
             role="tab"
-            aria-selected={tab === 'inspiration'}
+            aria-selected={tab === 'favoritos'}
           >
-            <Bookmark size={16} /> Inspiración
-          </button>
-          <button
-            type="button"
-            className={tab === 'wishlist' ? 'is-active' : ''}
-            onClick={() => setTab('wishlist')}
-            role="tab"
-            aria-selected={tab === 'wishlist'}
-          >
-            <Heart size={16} /> Wishlist
+            <Heart size={16} /> Favoritos
           </button>
         </div>
 
-        {tab === 'looks' && (
+        {tab === 'outfits' && (
           <div className="profile-content">
             {myOutfits.length === 0 ? (
               <EmptyState
-                icon={<Grid3X3 size={26} />}
-                title="Tu primer look te espera"
+                icon={<Shirt size={26} />}
+                title="Tu primer outfit te espera"
                 text="Publica una foto, añade las prendas y compártela con la comunidad."
               />
             ) : (
@@ -194,13 +174,13 @@ export function Profile({
           </div>
         )}
 
-        {tab === 'inspiration' && (
+        {tab === 'favoritos' && (
           <div className="profile-content">
             {savedOutfits.length === 0 ? (
               <EmptyState
-                icon={<Bookmark size={26} />}
+                icon={<Heart size={26} />}
                 title="Nada guardado todavía"
-                text="La inspiración es para los looks completos que quieres recordar."
+                text="Los outfits que marques como favoritos aparecerán aquí."
               />
             ) : (
               <div className="profile-saved-grid">
@@ -220,40 +200,6 @@ export function Profile({
                     </button>
                   ) : null,
                 )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {tab === 'wishlist' && (
-          <div className="profile-content">
-            {wishlist.length === 0 ? (
-              <EmptyState
-                icon={<Heart size={26} />}
-                title="Aún no quieres nada concreto"
-                text="Cuando te guste una prenda, guárdala con talla, color y una nota."
-              />
-            ) : (
-              <div className="profile-wishlist">
-                {wishlist.map(({ entry, product }) => (
-                  <button
-                    type="button"
-                    className="profile-wishlist-row"
-                    key={product.id}
-                    onClick={() => onOpenItem(product.id)}
-                  >
-                    <img src={product.image} alt="" style={{ objectPosition: product.imagePos }} />
-                    <span>
-                      <em>{product.brand}</em>
-                      <strong>{product.name}</strong>
-                      <small>
-                        {entry.size ? `Talla ${entry.size} · ` : ''}
-                        {entry.color ?? ''}
-                      </small>
-                    </span>
-                    <b>{formatPrice(product.price)}</b>
-                  </button>
-                ))}
               </div>
             )}
           </div>
