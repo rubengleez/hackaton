@@ -5678,20 +5678,6 @@ select:focus-visible {
   }
 }
 
-@media (max-height: 700px) and (min-width: 601px) {
-  .feed-title {
-    font-size: 30px;
-  }
-
-  .feed-content {
-    bottom: 84px;
-  }
-
-  .feed-rail {
-    bottom: 232px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
