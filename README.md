@@ -4,6 +4,19 @@ Prototipo funcional de **Tapp**, una app de inspiración y compra de looks donde
 
 La demo está pensada para **390 px de ancho** y también se puede abrir en escritorio: verás el móvil enmarcado sobre una portada editorial.
 
+## Demo online e instalación en iPhone
+
+**https://rubengleez.github.io/hackaton/**
+
+La web es una PWA instalable: incluye manifest, iconos, service worker y caché offline.
+
+1. Abre el enlace en **Safari** en tu iPhone.
+2. Toca el botón **Compartir**.
+3. Elige **Añadir a pantalla de inicio**.
+4. Abre **tapp.** desde el nuevo icono: se verá a pantalla completa, sin la barra de Safari, y tus datos se guardan en el dispositivo.
+
+> Tiene que ser Safari: Chrome en iOS no ofrece la opción de añadir a la pantalla de inicio.
+
 ## Ejecutar
 
 ```bash
