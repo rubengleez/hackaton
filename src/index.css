@@ -3436,7 +3436,8 @@ select:focus-visible {
 
 .profile-cover {
   position: relative;
-  height: 178px;
+  flex: 0 0 auto;
+  height: 216px;
   background: #d8cbbd;
   overflow: hidden;
 }
@@ -3473,14 +3474,17 @@ select:focus-visible {
 .profile-scroll {
   position: relative;
   z-index: 1;
-  margin-top: -43px;
+  flex: 0 0 auto;
+  margin-top: -56px;
   padding: 0 20px 15px;
+  text-align: center;
 }
 
 .profile-avatar-wrap {
   position: relative;
-  width: 90px;
-  height: 90px;
+  width: 106px;
+  height: 106px;
+  margin: 0 auto;
   border-radius: 50%;
   border: 4px solid var(--paper);
   background: #e3d8ca;
@@ -3492,13 +3496,13 @@ select:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 22%;
 }
 
 .profile-style-dot {
   position: absolute;
-  right: 5px;
-  bottom: 5px;
+  right: 7px;
+  bottom: 8px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -3507,7 +3511,7 @@ select:focus-visible {
 }
 
 .profile-intro {
-  padding-top: 7px;
+  padding-top: 10px;
 }
 
 .profile-intro h1 {
@@ -3528,7 +3532,7 @@ select:focus-visible {
 
 .profile-intro p {
   max-width: 300px;
-  margin-top: 7px;
+  margin: 7px auto 0;
   font-size: 10.5px;
   line-height: 1.45;
   color: #5e554c;
@@ -3537,6 +3541,7 @@ select:focus-visible {
 .profile-tags {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 5px;
   margin-top: 8px;
 }
@@ -3564,7 +3569,7 @@ select:focus-visible {
 .profile-stats button {
   border: 0;
   background: none;
-  text-align: left;
+  text-align: center;
   padding: 0;
 }
 
@@ -3634,7 +3639,8 @@ select:focus-visible {
 
 .profile-tabs {
   display: flex;
-  gap: 18px;
+  justify-content: center;
+  gap: 26px;
   margin-top: 15px;
   border-bottom: 1px solid var(--line);
 }

@@ -1,10 +1,10 @@
 import { useEffect, type ReactNode } from 'react'
 import {
-  Bookmark,
   Check,
   Home,
   MessageCircle,
   Plus,
+  Star,
   User,
   X,
 } from 'lucide-react'
@@ -212,7 +212,7 @@ export function BottomNav({
   const items = [
     { id: 'feed' as const, icon: Home, label: 'main' },
     { id: 'messages' as const, icon: MessageCircle, label: 'mensajes' },
-    { id: 'saved' as const, icon: Bookmark, label: 'wishlist' },
+    { id: 'saved' as const, icon: Star, label: 'wishlist' },
     { id: 'profile' as const, icon: User, label: 'perfil' },
   ]
 
