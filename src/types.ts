@@ -8,7 +8,31 @@ export type Category =
   | 'Bolso'
   | 'Accesorio'
 
-export type Style = 'Minimalista' | 'Streetwear' | 'Vintage' | 'Boho' | 'Clásico'
+export type Style =
+  | 'Minimalista'
+  | 'Casual'
+  | 'Streetwear'
+  | 'Vintage'
+  | 'Boho'
+  | 'Clásico'
+
+export type AccountType = 'personal' | 'marca' | 'influencer'
+
+export interface SessionSizes {
+  pants: string
+  top: string
+  shoes: string
+}
+
+export interface Session {
+  name: string
+  handle: string
+  accountType: AccountType
+  styles: Style[]
+  sizes: SessionSizes
+  guest?: boolean
+  createdAt: string
+}
 
 export type Occasion = 'Universidad' | 'Oficina' | 'Cena' | 'Festival' | 'Finde'
 

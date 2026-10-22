@@ -908,7 +908,7 @@ export function EditProfileSheet({ onClose }: { onClose: () => void }) {
   const [bio, setBio] = useState(me.bio)
   const [styles, setStyles] = useState<Style[]>(me.styles)
   const [error, setError] = useState('')
-  const allStyles: Style[] = ['Minimalista', 'Streetwear', 'Vintage', 'Boho', 'Clásico']
+  const allStyles: Style[] = ['Minimalista', 'Casual', 'Streetwear', 'Vintage', 'Boho', 'Clásico']
 
   const toggleStyle = (style: Style) => {
     setStyles((prev) =>
